@@ -27,12 +27,12 @@ public class TodoController {
     }
 
     @GetMapping("/{id}")
-    public Todo getById(@PathVariable Long id) {
+    public Todo getById(@PathVariable String id) {
         return repository.findById(id).orElseThrow();
     }
 
     @PutMapping("/{id}")
-    public Todo update(@PathVariable Long id, @RequestBody Todo todo) {
+    public Todo update(@PathVariable String id, @RequestBody Todo todo) {
         Todo existing = repository.findById(id).orElseThrow();
         existing.setTask(todo.getTask());
         existing.setCompleted(todo.isCompleted());
@@ -40,7 +40,7 @@ public class TodoController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         repository.deleteById(id);
     }
 }
