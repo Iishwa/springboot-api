@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: learning-dev
+  labels:
+    app: nginx
+spec:
+  replicas: 3  # Creates 3 Pods
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Max 1 extra Pod during update
+      maxUnavailable: 1  # Min 1 Pod always available
+  
+  selector:
+    matchLabels:
+      app: nginx         # Manages Pods with this label
+  
+  template:              # Pod template
+    metadata:
+      labels:
+        app: nginx       # Pod label
+        version: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5

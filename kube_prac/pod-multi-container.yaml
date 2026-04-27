@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app-pod
+  namespace: learning-dev
+spec:
+  containers:
+  # Container 1: Web server
+  - name: web
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: shared-data
+      mountPath: /usr/share/nginx/html
+  
+  # Container 2: Content generator
+  - name: sidecar
+    image: busybox:1.35
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo '<h1>Pod Name: $(hostname)</h1>' > /shared/index.html; sleep 10; done"]
+    volumeMounts:
+    - name: shared-data
+      mountPath: /shared
+  
+  volumes:
+  - name: shared-data
+    emptyDir: {}
