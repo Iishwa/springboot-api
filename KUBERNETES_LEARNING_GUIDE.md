@@ -1665,4 +1665,4 @@ kubectl label <resource> <name> <key>=<value> [-n <namespace>]
 
 ---
 
-Good luck with your Kubernetes learning journey! Start with Module 1 and progress step by step. Make sure to practice each exercise on your EKS cluster before moving forward.
+
