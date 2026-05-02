@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: learning-dev
+data:
+  app.properties: |
+    app.name=MyApp
+    app.version=1.0.0
+    log.level=INFO
+    database.host=db.example.com
+  app.env: production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-with-config
+  namespace: learning-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.25
+        env:
+        # Method 1: Single value from ConfigMap
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.env
+        volumeMounts:
+        # Method 2: Mount entire ConfigMap as file
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config

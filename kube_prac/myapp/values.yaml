@@ -1,0 +1,129 @@
+# Default values for myapp.
+# This file defines all configurable parameters for your Helm chart.
+# Each section maps to a template in /templates and can be overridden at install/upgrade time.
+
+# -- Number of replicas for the Deployment (ignored if autoscaling.enabled = true)
+replicaCount: 1
+
+# -- Container image configuration
+image:
+  repository: nginx                # Image repository (e.g., Docker Hub, ECR)
+  pullPolicy: IfNotPresent         # Image pull policy: Always, IfNotPresent, Never
+  tag: ""                          # Image tag (defaults to Chart.AppVersion if empty)
+
+# -- Secrets for pulling images from private registries
+imagePullSecrets: []
+
+# -- Override chart name or fullname
+nameOverride: ""
+fullnameOverride: ""
+
+# -- ServiceAccount configuration
+serviceAccount:
+  create: true                     # Whether to create a ServiceAccount
+  automount: true                  # Auto-mount API credentials
+  annotations: {}                  # Extra annotations
+  name: ""                         # Custom name (default: generated fullname)
+
+# -- Pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# -- Pod-level security context (e.g., fsGroup)
+podSecurityContext: {}
+#   fsGroup: 2000
+
+# -- Container-level security context (e.g., runAsUser)
+securityContext: {}
+#   runAsUser: 1000
+#   readOnlyRootFilesystem: true
+
+# -- Kubernetes Service configuration
+service:
+  type: ClusterIP                  # ClusterIP, NodePort, LoadBalancer
+  port: 80                         # Service port exposed
+
+# -- Ingress configuration for domain routing
+ingress:
+  enabled: true                    # Enable ingress resource
+  className: "nginx"               # Ingress controller class
+  annotations:                     # Extra ingress annotations
+    kubernetes.io/ingress.class: nginx
+  hosts:                           # Host rules
+    - host: myapp.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []                          # TLS configuration (certs/secrets)
+  # Example:
+  # - secretName: myapp-tls
+  #   hosts:
+  #     - myapp.example.com
+
+# -- Gateway API HTTPRoute (optional, advanced)
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  hostnames:
+    - chart-example.local
+  rules: []
+
+# -- Resource requests and limits
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+
+
+# -- Liveness probe configuration
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# -- Readiness probe configuration
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# -- Autoscaling configuration (HorizontalPodAutoscaler)
+autoscaling:
+  enabled: true                    # Enable HPA
+  minReplicas: 2                   # Minimum replicas
+  maxReplicas: 10                  # Maximum replicas
+  targetCPUUtilizationPercentage: 60  # Target CPU utilization percentage
+  # targetMemoryUtilizationPercentage: 70
+
+# -- Extra volumes for Deployment
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+
+# -- Extra volume mounts for containers
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+# -- Node scheduling options
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# -- Custom ConfigMap values (non-sensitive app configs)
+config:
+  APP_ENV: "production"            # Application environment
+  LOG_LEVEL: "info"                # Logging level
+
+# -- Custom Secret values (sensitive data, auto base64 encoded)
+secrets:
+  dbPassword: "supersecurepassword"  # Database password
